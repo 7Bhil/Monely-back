@@ -14,6 +14,7 @@ import os
 from pathlib import Path
 from datetime import timedelta
 from decouple import config
+import dj_database_url
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -30,7 +31,7 @@ DEBUG = config('DEBUG', default=True, cast=bool)
 
 ALLOWED_HOSTS = config(
     'ALLOWED_HOSTS', 
-    default='localhost,127.0.0.1,monely.onrender.com', 
+    default='localhost,127.0.0.1,monely.onrender.com,monely-api.onrender.com', 
     cast=lambda v: [s.strip() for s in v.split(',')]
 )
 
@@ -95,7 +96,18 @@ WSGI_APPLICATION = 'config.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
-if config('SUPABASE_DB_HOST', default=None) and config('SUPABASE_DB_PASSWORD', default=None):
+# Database configuration
+DATABASE_URL = config('DATABASE_URL', default=None)
+
+if DATABASE_URL:
+    DATABASES = {
+        'default': dj_database_url.config(
+            default=DATABASE_URL,
+            conn_max_age=600,
+            conn_health_checks=True,
+        )
+    }
+elif config('SUPABASE_DB_HOST', default=None) and config('SUPABASE_DB_PASSWORD', default=None):
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.postgresql',
@@ -107,7 +119,7 @@ if config('SUPABASE_DB_HOST', default=None) and config('SUPABASE_DB_PASSWORD', d
         }
     }
 else:
-    print("WARNING: Supabase credentials not found. Using SQLite for local development.")
+    print("WARNING: Database credentials not found. Using SQLite for local development.")
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.sqlite3',
