@@ -180,7 +180,7 @@ if DEBUG:
 else:
     CORS_ALLOWED_ORIGINS = config(
         'CORS_ALLOWED_ORIGINS',
-        default='http://localhost:5173,https://monely.netlify.app',
+        default='http://localhost:5173,https://monely.netlify.app,https://monely.onrender.com',
         cast=lambda v: [s.strip() for s in v.split(',')]
     )
     # Allow all localhost ports (for Flutter web, Vite, etc.)
