@@ -11,7 +11,7 @@ class TransactionViewSet(viewsets.ModelViewSet):
     search_fields = ['name', 'category']
 
     def get_queryset(self):
-        return Transaction.objects.filter(user=self.request.user)
+        return Transaction.objects.filter(user=self.request.user).select_related('wallet', 'receiver_wallet')
 
     def get_serializer_class(self):
         if self.action in ['create', 'update', 'partial_update']:

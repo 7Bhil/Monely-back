@@ -103,7 +103,7 @@ if DATABASE_URL:
     DATABASES = {
         'default': dj_database_url.config(
             default=DATABASE_URL,
-            conn_max_age=600,
+            conn_max_age=0,
             conn_health_checks=True,
         )
     }
@@ -183,6 +183,11 @@ else:
         default='http://localhost:5173,https://monely.netlify.app',
         cast=lambda v: [s.strip() for s in v.split(',')]
     )
+    # Allow all localhost ports (for Flutter web, Vite, etc.)
+    CORS_ALLOWED_ORIGIN_REGEXES = [
+        r'^http://localhost:\d+$',
+        r'^http://127\.0\.0\.1:\d+$',
+    ]
 
 CORS_ALLOW_CREDENTIALS = True
 

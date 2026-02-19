@@ -122,11 +122,18 @@ class Transaction(models.Model):
     
     def delete(self, *args, **kwargs):
         """Override delete to update wallet balance"""
-        # Revert the balance change
+        # Revert the balance change based on transaction type
         if self.type == 'income':
             self.wallet.balance -= self.amount
-        else:
+            self.wallet.save()
+        elif self.type == 'expense':
             self.wallet.balance += self.amount
-        
-        self.wallet.save()
+            self.wallet.save()
+        elif self.type == 'transfer':
+            # Revert: credit source wallet back, debit receiver wallet
+            self.wallet.balance += self.amount
+            self.wallet.save()
+            if self.receiver_wallet:
+                self.receiver_wallet.balance -= self.amount
+                self.receiver_wallet.save()
         super().delete(*args, **kwargs)
